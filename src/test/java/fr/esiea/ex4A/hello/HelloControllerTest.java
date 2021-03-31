@@ -7,31 +7,26 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-
-import static org.hamcrest.CoreMatchers.endsWith;
-import static org.hamcrest.CoreMatchers.startsWith;
-import static org.hamcrest.CoreMatchers.*;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.MOCK)
 @AutoConfigureMockMvc
-class HelloControllerIT {
+class HelloControllerTest {
 
     private final MockMvc mockMvc;
 
     @MockBean
-    private HelloRepository repository;
+    private HelloController controller;
 
-    HelloControllerIT(@Autowired MockMvc mockMvc) {
+    HelloControllerTest(@Autowired MockMvc mockMvc) {
         this.mockMvc = mockMvc;
     }
 
     @Test
-    void hello_delegates_to_repository_when_name_param_is_present() throws Exception {
-        when(repository.getHelloFor(any())).thenReturn(new HelloData("test"));
+    void sayHello_when_name_param_is_present() throws Exception{
+        when(controller.sayHello(any())).thenReturn(new HelloData("test"));
 
         mockMvc
             .perform(MockMvcRequestBuilders.get("/hello?name=test"))
@@ -44,22 +39,7 @@ class HelloControllerIT {
                         }
                         """));
 
-        verify(repository).getHelloFor("test");
-    }
-
-    @Test
-    void hello_delegates_to_random_when_name_param_is_absent() throws Exception {
-        when(repository.randomHello()).thenReturn(new HelloData("randomtest"));
-
-        mockMvc
-            .perform(MockMvcRequestBuilders.get("/hello"))
-            .andDo(MockMvcResultHandlers.print())
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.type").value("hello"))
-            .andExpect(jsonPath("$.name").value("randomtest"))
-            .andExpect(jsonPath("$.completeSentence").value(allOf(startsWith("hello"), endsWith("!"))));
-
-        verify(repository).randomHello();
+        verify(controller).sayHello("test");
     }
 
 }
