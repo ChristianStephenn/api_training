@@ -10,7 +10,7 @@ import java.util.List;
 public class Controller {
 
     private final UserRepository userRepository;
-    private List<UserInfo> userListe = new ArrayList<>();
+    private final List<UserInfo> userListe = new ArrayList<>();
 
     Controller(UserRepository userRepository){this.userRepository = userRepository;}
 
@@ -24,13 +24,10 @@ public class Controller {
     List<MatcheInfo> Matches(@RequestParam String userName, @RequestParam String userCountry){
         final List<MatcheInfo> matcheList = new ArrayList<>();
         UserInfo currentUserInfo = getUser(userName);
-        MatcheInfo matcheInfo;
         for (UserInfo userInfo : userListe) {
             if (!userName.equals(userInfo.getUserName()) && userCountry.equals(userInfo.getUserCountry())) {
-                if (currentUserInfo.getUserSexPref().equals(userInfo.getUserSex())){
-                    matcheInfo = new MatcheInfo(userInfo.getUserName(), userInfo.getUserTweeter());
-                    matcheList.add(matcheInfo);
-                }
+                if (currentUserInfo.getUserSexPref().equals(userInfo.getUserSex()))
+                    matcheList.add(new MatcheInfo(userInfo.getUserName(), userInfo.getUserTweeter()));
             }
         }
         return matcheList;
